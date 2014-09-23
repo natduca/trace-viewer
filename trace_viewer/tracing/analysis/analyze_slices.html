@@ -156,6 +156,26 @@ found in the LICENSE file.
 <polymer-element name="multiple-slices-analysis-sub-view"
     extends="tracing-analysis-sub-view"
     constructor="MultipleSlicesAnalysisSubView">
+  <template>
+    <style>
+    :host {
+      display: flex;
+      flex-direction: row;
+    }
+    analysis-table-container {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: auto;
+    }
+    pie-slice-analysis {
+      flex: 0 1 auto;
+      min-width: 100px;
+      overflow: hidden;
+    }
+    </style>
+    <analysis-table-container></analysis-table-container>
+    <pie-slice-analysis></pie-slice-analysis>
+  </template>
   <script>
   'use strict';
   (function() {
@@ -181,10 +201,18 @@ found in the LICENSE file.
 
       set selection(selection) {
         this.currentSelection_ = selection;
-        this.textContent = '';
 
-        if (selection.length === 0)
+        var tableContainerEl = this.shadowRoot.querySelector(
+            'analysis-table-container');
+        tableContainerEl.textContent = '';
+
+        var pieSliceAnalysis = this.shadowRoot.querySelector(
+            'pie-slice-analysis');
+        pieSliceAnalysis.selection = selection;
+
+        if (selection.length === 0) {
           return;
+        }
 
         var typeName = '';
         for (var i = 0; i < TYPE_TO_NAME_LIST.length; i++) {
@@ -196,8 +224,7 @@ found in the LICENSE file.
         }
 
         var results = new tracing.analysis.AnalysisResults();
-        this.appendChild(results);
-
+        tableContainerEl.appendChild(results);
         this.analyzeMultipleSlices_(results, selection, typeName);
       },
 
